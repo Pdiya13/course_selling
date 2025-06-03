@@ -8,7 +8,9 @@ CourseRouter.post("/purchase" , function(req,res){
 }); 
 
 CourseRouter.get("/preview" , function(req,res){
-
+    res.json({
+        msg : "your purchased courses",
+    })
 });
 
 module.exports = {
