@@ -1,20 +1,20 @@
 const express = require("express");
 const Router = express.Router;
 
-const UserRouter = Router();
+const userRouter = Router();
 
-UserRouter.post("/signup" , function(req,res){
-
-});
-
-UserRouter.post("/signin" , function(req,res){
+userRouter.post("/signup" , function(req,res){
 
 });
 
-UserRouter.get("/purchases" , function(req,res){
+userRouter.post("/signin" , function(req,res){
+
+});
+
+userRouter.get("/purchases" , function(req,res){
 
 });
 
 module.exports = {
-    UserRouter : UserRouter,
+    userRouter : userRouter,
 }
