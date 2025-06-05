@@ -5,7 +5,7 @@ const {adminModel, userModel, courseModel} = require("../db");
 const adminRouter = Router();
 const z = require('zod');
 const jwt = require("jsonwebtoken");
-const {JWT_USER_SECRET} = require('../config');
+const {JWT_USER_SECRET, JWT_ADMIN_SECRET} = require('../config');
 const { adminMiddleware } = require("../Middleware/admin");
 
 adminRouter.post("/signup" , async function(req,res){
@@ -77,7 +77,7 @@ adminRouter.post("/signin", async function (req, res) {
     if (passwordMatch) {
         const token = jwt.sign({
             id: user._id.toString()
-        }, JWT_USER_SECRET);
+        }, JWT_ADMIN_SECRET);
         res.json({ token });
     } else {
         res.status(403).json({
@@ -105,12 +105,51 @@ adminRouter.post("/course" ,adminMiddleware,async function(req,res){
     });
 });
 
-adminRouter.put("/course" , function(req,res){
+adminRouter.put("/course", adminMiddleware,async function(req,res){
+    const adminId = req.userId;
+    const {title ,description,price,imageUrl,courseId} = req.body;
+
+    const findCourse = await courseModel.findOne({
+        _id : courseId,
+        creatorId : adminId,
+    });
+
+    if(!findCourse)
+    {
+        res.json({
+            msg : "course not found with specific courseId and CreatorId",
+        });
+        return;
+    }
+
+    const course = await courseModel.updateOne({
+        _id : courseId,
+        creatorId : adminId,
+    },{
+        title : title,
+        description : description,
+        price : price,
+        imageUrl : imageUrl,
+    });
+
+    res.json({
+        msg : "Course Updated",
+        courseId : course._id,
+    });
 
 });
 
-adminRouter.get("/course/bulk" , function(req,res){
+adminRouter.get("/course/bulk" ,adminMiddleware, async function(req,res){
+    const adminId = req.userId;
 
+    const courses = await userModel.find({
+        creatorId : adminId
+    });
+
+    res.json({
+        msg : "available courses",
+        courses,
+    })
 });
 
 module.exports = {

@@ -83,7 +83,7 @@ userRouter.post("/signin" ,async function(req,res){
     {
         const token = jwt.sign({
             id : user._id.toString(),
-        },JWT_ADMIN_SECRET);
+        },JWT_USER_SECRET);
         res.json(token);
     }
     else {
