@@ -5,7 +5,7 @@ const {adminModel, userModel} = require("../db");
 const adminRouter = Router();
 const z = require('zod');
 const jwt = require("jsonwebtoken");
-const JWT_SECRET = "helloAdmin";
+const {JWT_USER_SECRET} = require('../config');
 
 adminRouter.post("/signup" , async function(req,res){
     const body = z.object({
@@ -76,7 +76,7 @@ adminRouter.post("/signin", async function (req, res) {
     if (passwordMatch) {
         const token = jwt.sign({
             id: user._id.toString()
-        }, JWT_SECRET);
+        }, JWT_USER_SECRET);
         res.json({ token });
     } else {
         res.status(403).json({
