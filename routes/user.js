@@ -1,11 +1,12 @@
 const express = require("express");
-const { userModel } = require("../db");
+const { userModel, courseModel, purchaseModel } = require("../db");
 const { email } = require("zod/v4");
 const Router = express.Router;
 const z = require('zod');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const { JWT_ADMIN_SECRET } = require("../config");
+const { userMiddleware } = require("../Middleware/user");
 
 const userRouter = Router();
 
@@ -93,8 +94,16 @@ userRouter.post("/signin" ,async function(req,res){
     }
 });
 
-userRouter.get("/purchases" , function(req,res){
+userRouter.get("/purchases" ,userMiddleware, function(req,res){
+    const userId = req.userId;
 
+    const purchases = purchaseModel.find({
+        userId,
+    });
+
+    res.json({
+        purchases,
+    })
 });
 
 module.exports = {
