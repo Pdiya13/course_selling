@@ -5,12 +5,13 @@ const Router = express.Router;
 const z = require('zod');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const { JWT_ADMIN_SECRET } = require("../config");
+const { JWT_USER_SECRET } = require("../config");
 const { userMiddleware } = require("../Middleware/user");
 
 const userRouter = Router();
 
-userRouter.post("/signup" ,async function(req,res){
+userRouter.post("/signup" ,async function(req,res){  // { "email" : "diya@gmail.com", "password" : "diya123", "firstName" : "diya", "lastName" : "patel" } 
+
     const body = z.object({
         email : z.string().min(4).max(20).email(),
         password : z.string().min(4).max(30),
@@ -62,7 +63,7 @@ userRouter.post("/signup" ,async function(req,res){
     }
 });
 
-userRouter.post("/signin" ,async function(req,res){
+userRouter.post("/signin" ,async function(req,res){  //{ "email" : "diya@gmail.com", "password" : "diya123"}
     const email = req.body.email;
     const password = req.body.password;
 
@@ -94,16 +95,25 @@ userRouter.post("/signin" ,async function(req,res){
     }
 });
 
-userRouter.get("/purchases" ,userMiddleware, function(req,res){
+userRouter.get("/purchases" ,userMiddleware,async function(req,res){
     const userId = req.userId;
 
-    const purchases = purchaseModel.find({
-        userId,
-    });
+    try {
+        const purchases = await purchaseModel.find({ userId });
+        const courseData = await courseModel.find ({
+            _id : { $in : purchases.map(x => x.courseId)}
+        })
 
-    res.json({
-        purchases,
-    })
+        res.json({
+            purchases,
+            courseData,
+        });
+    } catch (err) {
+        res.status(500).json({
+            message: "Failed to fetch purchases",
+            error: err.message,
+        });
+    }
 });
 
 module.exports = {

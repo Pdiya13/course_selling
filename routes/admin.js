@@ -5,10 +5,11 @@ const {adminModel, userModel, courseModel} = require("../db");
 const adminRouter = Router();
 const z = require('zod');
 const jwt = require("jsonwebtoken");
-const {JWT_USER_SECRET, JWT_ADMIN_SECRET} = require('../config');
+const {JWT_ADMIN_SECRET} = require('../config');
 const { adminMiddleware } = require("../Middleware/admin");
 
-adminRouter.post("/signup" , async function(req,res){
+adminRouter.post("/signup" , async function(req,res){    // { "email" : "lata@gmail.com", "password" : "lata123", "firstName" : "lata",  "lastName" : "patel" } 
+
     const body = z.object({
         email : z.string().min(3).max(100).email(),
         password : z.string().min(3).max(30),
@@ -59,7 +60,7 @@ adminRouter.post("/signup" , async function(req,res){
 
 });
 
-adminRouter.post("/signin", async function (req, res) {
+adminRouter.post("/signin", async function (req, res) {    // { "email" : "lata@gmail.com", "password" : "lata123" }
     const email = req.body.email;
     const password = req.body.password;
 
@@ -86,7 +87,8 @@ adminRouter.post("/signin", async function (req, res) {
     }
 });
 
-adminRouter.post("/course" ,adminMiddleware,async function(req,res){
+adminRouter.post("/course" ,adminMiddleware,async function(req,res){  // {  "title" : "python",    "description" : "description",   "price" : 4999, "imageUrl" : "https://en.m.wikipedia.org/wiki/File:Python-logo-notext.svg", "creatorId" : "6842c9f4c36e915cd420c66c" }
+
     const creatorId = req.userId;
 
     const {title, description, price, imageUrl} = req.body;
@@ -105,7 +107,7 @@ adminRouter.post("/course" ,adminMiddleware,async function(req,res){
     });
 });
 
-adminRouter.put("/course", adminMiddleware,async function(req,res){
+adminRouter.put("/course", adminMiddleware,async function(req,res){   // {  "title" : "python",    "description" : "description",   "price" : 4999, "imageUrl" : "https://en.m.wikipedia.org/wiki/File:Python-logo-notext.svg",  "courseId": "6842caf1c36e915cd420c66f" }
     const adminId = req.userId;
     const {title ,description,price,imageUrl,courseId} = req.body;
 
@@ -142,8 +144,8 @@ adminRouter.put("/course", adminMiddleware,async function(req,res){
 adminRouter.get("/course/bulk" ,adminMiddleware, async function(req,res){
     const adminId = req.userId;
 
-    const courses = await userModel.find({
-        creatorId : adminId
+    const courses = await courseModel.find({
+        creatorId : adminId,
     });
 
     res.json({

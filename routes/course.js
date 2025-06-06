@@ -5,7 +5,7 @@ const Router = express.Router;
 
 const courseRouter = Router();
 
-courseRouter.post("/purchase",userMiddleware ,async function(req,res){
+courseRouter.post("/purchase",userMiddleware ,async function(req,res){    // { "courseId" : "68418a968ef4cf1cbdf6b10d" } 
     const userId = req.userId;
     const courseId = req.body.courseId;
 
@@ -19,9 +19,9 @@ courseRouter.post("/purchase",userMiddleware ,async function(req,res){
     })
 }); 
 
-courseRouter.get("/preview" , function(req,res){
+courseRouter.get("/preview" ,async function(req,res){
 
-    const courses = courseModel.find({});
+    const courses = await courseModel.find({});
 
     res.json({
         msg : "Available Courses",
